@@ -28,6 +28,7 @@
  */
 
 #include "cam_list.h"
+#include <stdlib.h>
 
 typedef struct {
     struct cam_list list;
