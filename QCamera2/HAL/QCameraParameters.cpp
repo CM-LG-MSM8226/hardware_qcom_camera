@@ -549,7 +549,7 @@ const QCameraParameters::QCameraMap QCameraParameters::FLIP_MODES_MAP[] = {
  *==========================================================================*/
 QCameraParameters::QCameraParameters()
     : CameraParameters(),
-      m_reprocScaleParam(this),
+      m_reprocScaleParam(),
       m_pCapability(NULL),
       m_pCamOpsTbl(NULL),
       m_pParamHeap(NULL),
@@ -622,7 +622,7 @@ QCameraParameters::QCameraParameters()
  *==========================================================================*/
 QCameraParameters::QCameraParameters(const String8 &params)
     : CameraParameters(params),
-    m_reprocScaleParam(this),
+    m_reprocScaleParam(),
     m_pCapability(NULL),
     m_pCamOpsTbl(NULL),
     m_pParamHeap(NULL),
@@ -7523,11 +7523,11 @@ int32_t QCameraParameters::commitParamChanges()
  *
  * RETURN     : none
  *==========================================================================*/
-QCameraReprocScaleParam::QCameraReprocScaleParam(QCameraParameters *parent)
-  : mParent(parent),
+QCameraReprocScaleParam::QCameraReprocScaleParam()
+  : //mParent(parent),
     mScaleEnabled(false),
     mIsUnderScaling(false),
-    mScaleDirection(0),
+    //mScaleDirection(0),
     mNeedScaleCnt(0),
     mSensorSizeTblCnt(0),
     mSensorSizeTbl(NULL),
