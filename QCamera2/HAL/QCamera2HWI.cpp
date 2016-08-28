@@ -1348,6 +1348,7 @@ int QCamera2HardwareInterface::initCapabilities(uint32_t cameraId,
 {
     ATRACE_CALL();
     int rc = NO_ERROR;
+    unsigned int ii = 0;
     QCameraHeapMemory *capabilityHeap = NULL;
 
     /* Allocate memory for capability buffer */
@@ -1385,12 +1386,24 @@ int QCamera2HardwareInterface::initCapabilities(uint32_t cameraId,
 
     //copy the preview sizes and video sizes lists because they
     //might be changed later
+    ALOGD("YODA: gCam[%d]: preview_sizes_tbl_cnt = %d, video_sizes_tbl_cnt = %d", cameraId, gCamCapability[cameraId]->preview_sizes_tbl_cnt, gCamCapability[cameraId]->video_sizes_tbl_cnt);
+    ALOGD("YODA: preview_sizes_tbl:");
+    for (ii = 0; ii < gCamCapability[cameraId]->preview_sizes_tbl_cnt; ii++) {
+        ALOGD("YODA: [%d] = %dx%d", ii, gCamCapability[cameraId]->preview_sizes_tbl[ii].width, gCamCapability[cameraId]->preview_sizes_tbl[ii].height);
+    }
+    ALOGD("-------------------------");
+    ALOGD("YODA: video_sizes_tbl:");
+    for (ii = 0; ii < gCamCapability[cameraId]->video_sizes_tbl_cnt; ii++) {
+        ALOGD("YODA: [%d] = %dx%d", ii, gCamCapability[cameraId]->video_sizes_tbl[ii].width, gCamCapability[cameraId]->video_sizes_tbl[ii].height);
+    }
     copyList(gCamCapability[cameraId]->preview_sizes_tbl, savedSizes[cameraId].all_preview_sizes,
              gCamCapability[cameraId]->preview_sizes_tbl_cnt);
     savedSizes[cameraId].all_preview_sizes_cnt = gCamCapability[cameraId]->preview_sizes_tbl_cnt;
+    ALOGD("YODA: Copying preview okay!!!");
     copyList(gCamCapability[cameraId]->video_sizes_tbl, savedSizes[cameraId].all_video_sizes,
              gCamCapability[cameraId]->video_sizes_tbl_cnt);
     savedSizes[cameraId].all_video_sizes_cnt = gCamCapability[cameraId]->video_sizes_tbl_cnt;
+    ALOGD("YODA: Copying video okay!!!");
 
     rc = NO_ERROR;
 
