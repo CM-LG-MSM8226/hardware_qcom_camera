@@ -1237,7 +1237,7 @@ int QCamera2HardwareInterface::openCamera()
           gCamCapability[mCameraId]->video_sizes_tbl_cnt--;
        }
     }
-
+    ALOGD("Run JpegIntf.init with m_max_pic_width = %d, m_max_pic_height = %d", m_max_pic_width, m_max_pic_height);
     int32_t rc = m_postprocessor.init(jpegEvtHandle, this);
     if (rc != 0) {
         ALOGE("Init Postprocessor failed");

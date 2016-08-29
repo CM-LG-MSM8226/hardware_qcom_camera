@@ -1742,7 +1742,8 @@ int32_t mm_jpeg_init(mm_jpeg_obj *my_obj)
     pthread_mutex_destroy(&my_obj->job_lock);
     return -1;
   }
-
+  my_obj->max_pic_w = 3264;
+  my_obj->max_pic_h = 2448;
   /* set work buf size from max picture size */
   if (my_obj->max_pic_w <= 0 || my_obj->max_pic_h <= 0) {
     CDBG_ERROR("%s:%d] Width and height are not valid "
