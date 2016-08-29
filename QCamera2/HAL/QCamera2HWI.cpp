@@ -1166,16 +1166,19 @@ int QCamera2HardwareInterface::openCamera()
     }
     if (NULL == gCamCapability[mCameraId])
         initCapabilities(mCameraId,mCameraHandle);
-
     mCameraHandle->ops->register_event_notify(mCameraHandle->camera_handle,
                                               camEvtHandle,
                                               (void *) this);
+    //ALOGD("OPEN YODA: gCam[%d]->picture_sizes_tbl_cnt = %d", mCameraId, gCamCapability[mCameraId]->picture_sizes_tbl_cnt);
 
+    // limit struct
+    gCamCapability[mCameraId]->picture_sizes_tbl_cnt = 36;
     /* get max pic size for jpeg work buf calculation*/
     for(i = 0; i < gCamCapability[mCameraId]->picture_sizes_tbl_cnt - 1; i++)
     {
       l_curr_width = gCamCapability[mCameraId]->picture_sizes_tbl[i].width;
       l_curr_height = gCamCapability[mCameraId]->picture_sizes_tbl[i].height;
+      //ALOGD("OPEN YODA[%d]: %dx%d", i, l_curr_width, l_curr_height);
 
       if ((l_curr_width * l_curr_height) >
         (m_max_pic_width * m_max_pic_height)) {
@@ -1190,7 +1193,6 @@ int QCamera2HardwareInterface::openCamera()
     copyList(savedSizes[mCameraId].all_video_sizes, gCamCapability[mCameraId]->video_sizes_tbl,
              savedSizes[mCameraId].all_video_sizes_cnt);
     gCamCapability[mCameraId]->video_sizes_tbl_cnt = savedSizes[mCameraId].all_video_sizes_cnt;
-
     //check if video size 4k x 2k support is enabled
     property_get("persist.camera.4k2k.enable", value, "0");
     enable_4k2k = atoi(value) > 0 ? 1 : 0;
@@ -1348,7 +1350,7 @@ int QCamera2HardwareInterface::initCapabilities(uint32_t cameraId,
 {
     ATRACE_CALL();
     int rc = NO_ERROR;
-    unsigned int ii = 0;
+    //size_t ii = 0;
     QCameraHeapMemory *capabilityHeap = NULL;
 
     /* Allocate memory for capability buffer */
@@ -1386,16 +1388,23 @@ int QCamera2HardwareInterface::initCapabilities(uint32_t cameraId,
 
     //copy the preview sizes and video sizes lists because they
     //might be changed later
-    ALOGD("YODA: gCam[%d]: preview_sizes_tbl_cnt = %d, video_sizes_tbl_cnt = %d", cameraId, gCamCapability[cameraId]->preview_sizes_tbl_cnt, gCamCapability[cameraId]->video_sizes_tbl_cnt);
-    ALOGD("YODA: preview_sizes_tbl:");
-    for (ii = 0; ii < gCamCapability[cameraId]->preview_sizes_tbl_cnt; ii++) {
+    //ALOGD("YODA: gCam[%d]: preview_sizes_tbl_cnt = %d, video_sizes_tbl_cnt = %d", cameraId, gCamCapability[cameraId]->preview_sizes_tbl_cnt, gCamCapability[cameraId]->video_sizes_tbl_cnt);
+    //ALOGD("YODA: preview_sizes_tbl:");
+
+    // limit structs
+    gCamCapability[cameraId]->preview_sizes_tbl_cnt = 45;
+    gCamCapability[cameraId]->video_sizes_tbl_cnt = 42;
+
+    /*for (ii = 0; ii < gCamCapability[cameraId]->preview_sizes_tbl_cnt; ii++) {
         ALOGD("YODA: [%d] = %dx%d", ii, gCamCapability[cameraId]->preview_sizes_tbl[ii].width, gCamCapability[cameraId]->preview_sizes_tbl[ii].height);
     }
     ALOGD("-------------------------");
+
     ALOGD("YODA: video_sizes_tbl:");
     for (ii = 0; ii < gCamCapability[cameraId]->video_sizes_tbl_cnt; ii++) {
         ALOGD("YODA: [%d] = %dx%d", ii, gCamCapability[cameraId]->video_sizes_tbl[ii].width, gCamCapability[cameraId]->video_sizes_tbl[ii].height);
-    }
+    }*/
+
     copyList(gCamCapability[cameraId]->preview_sizes_tbl, savedSizes[cameraId].all_preview_sizes,
              gCamCapability[cameraId]->preview_sizes_tbl_cnt);
     savedSizes[cameraId].all_preview_sizes_cnt = gCamCapability[cameraId]->preview_sizes_tbl_cnt;
