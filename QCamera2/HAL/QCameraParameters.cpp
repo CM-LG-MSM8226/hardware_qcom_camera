@@ -35,6 +35,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include <gralloc_priv.h>
+#include <sys/sysinfo.h>
 #include "QCamera2HWI.h"
 #include "QCameraParameters.h"
 
@@ -110,6 +111,8 @@ const char QCameraParameters::KEY_QC_SNAPSHOT_BURST_NUM[] = "snapshot-burst-num"
 const char QCameraParameters::KEY_QC_SNAPSHOT_FD_DATA[] = "snapshot-fd-data-enable";
 const char QCameraParameters::KEY_QC_TINTLESS_ENABLE[] = "tintless";
 const char QCameraParameters::KEY_QC_VIDEO_ROTATION[] = "video-rotation";
+const char QCameraParameters::KEY_QC_LONGSHOT_SUPPORTED[] = "longshot-supported";
+const char QCameraParameters::KEY_QC_ZSL_HDR_SUPPORTED[] = "zsl-hdr-supported";
 
 // Values for effect settings.
 const char QCameraParameters::EFFECT_EMBOSS[] = "emboss";
@@ -536,6 +539,7 @@ const QCameraParameters::QCameraMap QCameraParameters::FLIP_MODES_MAP[] = {
 #define DEFAULT_CAMERA_AREA "(0, 0, 0, 0, 0)"
 #define DATA_PTR(MEM_OBJ,INDEX) MEM_OBJ->getPtr( INDEX )
 #define MIN_PP_BUF_CNT 1
+#define TOTAL_RAM_SIZE_512MB 536870912
 
 
 /*===========================================================================
@@ -580,7 +584,7 @@ QCameraParameters::QCameraParameters()
       m_bAVTimerEnabled(false),
       m_bDISEnabled(false),
       m_AdjustFPS(NULL),
-      m_bHDR1xFrameEnabled(true),
+      m_bHDR1xFrameEnabled(false),
       m_HDRSceneEnabled(false),
       m_bHDRThumbnailProcessNeeded(false),
       m_bHDR1xExtraBufferNeeded(true),
@@ -650,7 +654,7 @@ QCameraParameters::QCameraParameters(const String8 &params)
     m_bLongShotEnabled(false),
     m_bAVTimerEnabled(false),
     m_AdjustFPS(NULL),
-    m_bHDR1xFrameEnabled(true),
+    m_bHDR1xFrameEnabled(false),
     m_HDRSceneEnabled(false),
     m_bHDRThumbnailProcessNeeded(false),
     m_bHDR1xExtraBufferNeeded(true),
@@ -1336,47 +1340,8 @@ int32_t QCameraParameters::setJpegThumbnailSize(const QCameraParameters& params)
 
     ALOGV("requested jpeg thumbnail size %d x %d", width, height);
 
-    int sizes_cnt = sizeof(THUMBNAIL_SIZES_MAP) / sizeof(cam_dimension_t);
-
-    int pic_width = 0, pic_height = 0;
-    params.getPictureSize(&pic_width, &pic_height);
-    if (pic_height == 0) {
-        ALOGE("%s: picture size is invalid (%d x %d)", __func__, pic_width, pic_height);
-        return BAD_VALUE;
-    }
-    double picAspectRatio = (double)pic_width / pic_height;
-
-    int optimalWidth = 0, optimalHeight = 0;
-    if (width != 0 || height != 0) {
-        // If input jpeg thumnmail size is (0,0), meaning no thumbnail needed
-        // hornor this setting.
-        // Otherwise, find optimal jpeg thumbnail size that has same aspect ration
-        // as picture size
-
-        // Try to find a size matches aspect ratio and has the largest width
-        for (int i = 0; i < sizes_cnt; i++) {
-            if (THUMBNAIL_SIZES_MAP[i].height == 0) {
-                // No thumbnail case, just skip
-                continue;
-            }
-            double ratio =
-                (double)THUMBNAIL_SIZES_MAP[i].width / THUMBNAIL_SIZES_MAP[i].height;
-            if (fabs(ratio - picAspectRatio) > ASPECT_TOLERANCE)  {
-                continue;
-            }
-            if (THUMBNAIL_SIZES_MAP[i].width > optimalWidth) {
-                optimalWidth = THUMBNAIL_SIZES_MAP[i].width;
-                optimalHeight = THUMBNAIL_SIZES_MAP[i].height;
-            }
-        }
-        if (optimalWidth == 0 && optimalHeight == 0) {
-            ALOGD("%s: Could not find optimal size", __func__);
-            optimalWidth = width;
-            optimalHeight = height;
-        }
-    }
-    set(KEY_JPEG_THUMBNAIL_WIDTH, optimalWidth);
-    set(KEY_JPEG_THUMBNAIL_HEIGHT, optimalHeight);
+    set(KEY_JPEG_THUMBNAIL_WIDTH, width);
+    set(KEY_JPEG_THUMBNAIL_HEIGHT, height);
     return NO_ERROR;
 }
 
@@ -3723,7 +3688,12 @@ int32_t QCameraParameters::initDefaultParameters()
             m_pCapability->supported_effects_cnt,
             EFFECT_MODES_MAP,
             sizeof(EFFECT_MODES_MAP) / sizeof(QCameraMap));
-    set(KEY_SUPPORTED_EFFECTS, effectValues);
+    if (m_pCapability->supported_effects_cnt > 0) {
+        set(KEY_SUPPORTED_EFFECTS, effectValues);
+    } else {
+        ALOGE("Color effects are not available");
+        set(KEY_SUPPORTED_EFFECTS, EFFECT_NONE);
+    }
     setEffect(EFFECT_NONE);
 
     // Set WhiteBalance
@@ -3860,7 +3830,7 @@ int32_t QCameraParameters::initDefaultParameters()
     set(KEY_QC_SUPPORTED_SCENE_DETECT, onOffValues);
     setSceneDetect(VALUE_OFF);
     m_bHDREnabled = false;
-    m_bHDR1xFrameEnabled = true;
+    m_bHDR1xFrameEnabled = false;
 
     m_bHDRThumbnailProcessNeeded = false;
     m_bHDR1xExtraBufferNeeded = true;
@@ -3932,6 +3902,20 @@ int32_t QCameraParameters::initDefaultParameters()
 
     // Set default Camera mode
     set(KEY_QC_CAMERA_MODE, 0);
+
+    //Get RAM size and disable features which are memory rich
+    struct sysinfo info;
+    sysinfo(&info);
+
+    ALOGV("%s: totalram = %ld, freeram = %ld ", __func__, info.totalram,
+        info.freeram);
+    if (info.totalram > TOTAL_RAM_SIZE_512MB) {
+        set(KEY_QC_LONGSHOT_SUPPORTED, VALUE_TRUE);
+        set(KEY_QC_ZSL_HDR_SUPPORTED, VALUE_TRUE);
+    } else {
+        set(KEY_QC_LONGSHOT_SUPPORTED, VALUE_FALSE);
+        set(KEY_QC_ZSL_HDR_SUPPORTED, VALUE_FALSE);
+    }
 
     int32_t rc = commitParameters();
     if (rc == NO_ERROR) {

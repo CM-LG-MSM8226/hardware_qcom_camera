@@ -509,6 +509,12 @@ void QCamera2HardwareInterface::release_recording_frame(
         ALOGE("NULL camera device");
         return;
     }
+
+    if (opaque == NULL) {
+        ALOGE("%s: Error!! Frame info is NULL", __func__);
+        return;
+    }
+
     ALOGD("%s: E", __func__);
     hw->lockAPI();
     int32_t ret = hw->processAPI(QCAMERA_SM_EVT_RELEASE_RECORIDNG_FRAME, (void *)opaque);
@@ -2428,6 +2434,7 @@ char* QCamera2HardwareInterface::getParameters()
 
     int cur_width, cur_height;
 
+    pthread_mutex_lock(&m_parm_lock);
     //Need take care Scale picture size
     if(mParameters.m_reprocScaleParam.isScaleEnabled() &&
         mParameters.m_reprocScaleParam.isUnderScaling()){
@@ -2460,6 +2467,7 @@ char* QCamera2HardwareInterface::getParameters()
         pic_size.append(buffer);
         mParameters.set(CameraParameters::KEY_PICTURE_SIZE, pic_size);
     }
+    pthread_mutex_unlock(&m_parm_lock);
     return strParams;
 }
 
