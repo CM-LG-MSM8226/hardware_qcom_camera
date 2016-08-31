@@ -404,7 +404,8 @@ typedef enum {
     CAM_ISO_MODE_400,
     CAM_ISO_MODE_800,
     CAM_ISO_MODE_1600,
-    CAM_ISO_MODE_MAX
+    CAM_ISO_MODE_3200,
+    CAM_ISO_MODE_MAX //8
 } cam_iso_mode_type;
 
 typedef enum {

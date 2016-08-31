@@ -49,7 +49,11 @@
 
 namespace qcamera {
 
-cam_capability_t *gCamCapability[MM_CAMERA_MAX_NUM_SENSORS];
+static union {
+    cam_capability_t *gCamCapability[MM_CAMERA_MAX_NUM_SENSORS];
+    int32_t *matrix;
+};
+
 qcamera_saved_sizes_list savedSizes[MM_CAMERA_MAX_NUM_SENSORS];
 
 static pthread_mutex_t g_camlock = PTHREAD_MUTEX_INITIALIZER;
@@ -1287,12 +1291,29 @@ int QCamera2HardwareInterface::initCapabilities(int cameraId,mm_camera_vtbl_t *c
         goto query_failed;
     }
     gCamCapability[cameraId] = (cam_capability_t *)malloc(sizeof(cam_capability_t));
+    matrix = new int32_t[sizeof(cam_capability_t) / sizeof(int32_t)]; //  6240 / 4 = 1560
+
     if (!gCamCapability[cameraId]) {
         ALOGE("%s: out of memory", __func__);
         goto query_failed;
     }
     memcpy(gCamCapability[cameraId], DATA_PTR(capabilityHeap,0),
                                         sizeof(cam_capability_t));
+
+    ALOGD("CRAZY-UNION: Displaying gCamCapability data");
+
+    for (unsigned int ii = 0; ii < 15; ii++) {
+        ALOGD("CRAZY-UNION[%d] = %d", ii, matrix[ii]);
+    }
+
+    ALOGD("CRAZY-UNION: -----------------------------");
+    ALOGD("CRAZY-UNION: Displaying gCamCapability elements");
+    ALOGD("CRAZY-UNION: ->version(size=%d) = %d", sizeof(gCamCapability[cameraId]->version), gCamCapability[cameraId]->version);
+    ALOGD("CRAZY-UNION: ->position(size=%d) = %d", sizeof(gCamCapability[cameraId]->position), gCamCapability[cameraId]->position);
+    ALOGD("CRAZY-UNION: ->supported_iso_modes_cnt(size=%d) = %d", sizeof(gCamCapability[cameraId]->supported_iso_modes_cnt), gCamCapability[cameraId]->supported_iso_modes_cnt);
+    for (unsigned int jj = 0; jj < 8; jj++) {
+        ALOGD("CRAZY-UNION: ->supported_iso_modes[%d](size=%d) = %d", jj, sizeof(gCamCapability[cameraId]->supported_iso_modes[jj]), gCamCapability[cameraId]->supported_iso_modes[jj]);
+    }
 
     //copy the preview sizes and video sizes lists because they
     //might be changed later

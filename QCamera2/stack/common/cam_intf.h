@@ -246,7 +246,7 @@ typedef struct{
     int64_t raw_min_duration;
 
     uint8_t supported_sizes_tbl_cnt;
-    cam_dimension_t supported_sizes_tbl[MAX_SIZES_CNT];
+    cam_dimension_t supported_sizes_tbl[MAX_SIZES_CNT]; //100
 
     /* The minimum frame duration that is supported for each
      * resolution in availableProcessedSizes. Should correspond
@@ -275,7 +275,7 @@ typedef struct{
 
     /* picture sizes need scale*/
     uint8_t scale_picture_sizes_cnt;
-    cam_dimension_t scale_picture_sizes[MAX_SCALE_SIZES_CNT];
+    cam_dimension_t scale_picture_sizes[MAX_SCALE_SIZES_CNT]; //112
 } cam_capability_t;
 
 typedef enum {
