@@ -1302,17 +1302,45 @@ int QCamera2HardwareInterface::initCapabilities(int cameraId,mm_camera_vtbl_t *c
 
     ALOGD("CRAZY-UNION: Displaying gCamCapability data");
 
-    for (unsigned int ii = 0; ii < 15; ii++) {
-        ALOGD("CRAZY-UNION[%d] = %d", ii, matrix[ii]);
+    unsigned int jj;
+    for (jj = 0; jj < 150; jj++) {
+        ALOGD("CRAZY-UNION:MATRIX[%d] = %d", jj, matrix[jj]);
     }
 
     ALOGD("CRAZY-UNION: -----------------------------");
     ALOGD("CRAZY-UNION: Displaying gCamCapability elements");
     ALOGD("CRAZY-UNION: ->version(size=%d) = %d", sizeof(gCamCapability[cameraId]->version), gCamCapability[cameraId]->version);
     ALOGD("CRAZY-UNION: ->position(size=%d) = %d", sizeof(gCamCapability[cameraId]->position), gCamCapability[cameraId]->position);
+    //ALOGD("CRAZY-UNION: ->auto_hdr_supported(size=%d) = %d", sizeof(gCamCapability[cameraId]->auto_hdr_supported), gCamCapability[cameraId]->auto_hdr_supported);
     ALOGD("CRAZY-UNION: ->supported_iso_modes_cnt(size=%d) = %d", sizeof(gCamCapability[cameraId]->supported_iso_modes_cnt), gCamCapability[cameraId]->supported_iso_modes_cnt);
-    for (unsigned int jj = 0; jj < 8; jj++) {
+    for (jj = 0; jj < 8; jj++) {
         ALOGD("CRAZY-UNION: ->supported_iso_modes[%d](size=%d) = %d", jj, sizeof(gCamCapability[cameraId]->supported_iso_modes[jj]), gCamCapability[cameraId]->supported_iso_modes[jj]);
+    }
+    //ALOGD("CRAZY-UNION: ->min_exposure_time(size=%d) = %d", sizeof(gCamCapability[cameraId]->min_exposure_time), gCamCapability[cameraId]->min_exposure_time);
+    //ALOGD("CRAZY-UNION: ->max_exposure_time(size=%d) = %d", sizeof(gCamCapability[cameraId]->max_exposure_time), gCamCapability[cameraId]->max_exposure_time);
+    ALOGD("CRAZY-UNION: ->supported_flash_modes_cnt(size=%d) = %d", sizeof(gCamCapability[cameraId]->supported_flash_modes_cnt), gCamCapability[cameraId]->supported_flash_modes_cnt);
+    for (jj = 0; jj < 4; jj++) {
+        ALOGD("CRAZY-UNION: ->supported_flash_modes[%d](size=%d) = %d", jj, sizeof(gCamCapability[cameraId]->supported_flash_modes[jj]), gCamCapability[cameraId]->supported_flash_modes[jj]);
+    }
+    ALOGD("CRAZY-UNION: ->zoom_ratio_tbl_cnt(size=%d) = %d", sizeof(gCamCapability[cameraId]->zoom_ratio_tbl_cnt), gCamCapability[cameraId]->zoom_ratio_tbl_cnt);
+    for (jj = 0; jj < 79; jj++) {
+        ALOGD("CRAZY-UNION: ->zoom_ratio_tbl[%d](size=%d) = %d", jj, sizeof(gCamCapability[cameraId]->zoom_ratio_tbl[jj]), gCamCapability[cameraId]->zoom_ratio_tbl[jj]);
+    }
+    ALOGD("CRAZY-UNION: ->supported_effects_cnt(size=%d) = %d", sizeof(gCamCapability[cameraId]->supported_effects_cnt), gCamCapability[cameraId]->supported_effects_cnt);
+    for (jj = 0; jj < 12; jj++) {
+        ALOGD("CRAZY-UNION: ->supported_effects[%d](size=%d) = %d", jj, sizeof(gCamCapability[cameraId]->supported_effects[jj]), gCamCapability[cameraId]->supported_effects[jj]);
+    }
+    ALOGD("CRAZY-UNION: ->supported_scene_modes_cnt(size=%d) = %d", sizeof(gCamCapability[cameraId]->supported_scene_modes_cnt), gCamCapability[cameraId]->supported_scene_modes_cnt);
+    for (jj = 0; jj < 22; jj++) {
+        ALOGD("CRAZY-UNION: ->supported_scene_modes[%d](size=%d) = %d", jj, sizeof(gCamCapability[cameraId]->supported_scene_modes[jj]), gCamCapability[cameraId]->supported_scene_modes[jj]);
+    }
+    ALOGD("CRAZY-UNION: ->supported_aec_modes_cnt(size=%d) = %d", sizeof(gCamCapability[cameraId]->supported_aec_modes_cnt), gCamCapability[cameraId]->supported_aec_modes_cnt);
+    ALOGD("CRAZY-UNION: ->fps_ranges_tbl_cnt(size=%d) = %d", sizeof(gCamCapability[cameraId]->fps_ranges_tbl_cnt), gCamCapability[cameraId]->fps_ranges_tbl_cnt);
+    for (jj = 0; jj < 24; jj++) {
+        ALOGD("CRAZY-UNION: ->fps_ranges_tbl[%d].min_fps(size=%d) = %f", jj, sizeof(gCamCapability[cameraId]->fps_ranges_tbl[jj].min_fps), gCamCapability[cameraId]->fps_ranges_tbl[jj].min_fps);
+        ALOGD("CRAZY-UNION: ->fps_ranges_tbl[%d].max_fps(size=%d) = %f", jj, sizeof(gCamCapability[cameraId]->fps_ranges_tbl[jj].max_fps), gCamCapability[cameraId]->fps_ranges_tbl[jj].max_fps);
+        //ALOGD("CRAZY-UNION: ->fps_ranges_tbl[%d].video_min_fps(size=%d) = %f", jj, sizeof(gCamCapability[cameraId]->fps_ranges_tbl[jj].video_min_fps), gCamCapability[cameraId]->fps_ranges_tbl[jj].video_min_fps);
+        //ALOGD("CRAZY-UNION: ->fps_ranges_tbl[%d].video_max_fps(size=%d) = %f", jj, sizeof(gCamCapability[cameraId]->fps_ranges_tbl[jj].video_max_fps), gCamCapability[cameraId]->fps_ranges_tbl[jj].video_max_fps);
     }
 
     //copy the preview sizes and video sizes lists because they
